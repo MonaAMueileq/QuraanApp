@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _search(String searchValue) {
     int pageNumber = -1;
     for (Map ayahData in _items) {
-      if (ayahData['sura_name_ar'] == searchValue) {
+      if (ayahData['sura_name_ar'].replaceAll(RegExp(r"[\u064B-\u0652]"), '') == searchValue) {
         pageNumber = ayahData['page'];
         break;
       }
