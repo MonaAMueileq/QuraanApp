@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
@@ -33,29 +33,18 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List _items = [];
-  String SurahName = '';
   PageController _pageController = PageController();
+
 
   Future<void> readJson() async {
     final String response =
-    await rootBundle.loadString('assets/hafs_smart_v8.json');
+        await rootBundle.loadString('assets/hafs_smart_v8.json');
     final data = await json.decode(response);
     setState(() {
       _items = data["sura"];
     });
   }
-  void _search(String searchValue) {
-    int pageNumber = -1;
-    for (Map ayahData in _items) {
-      if (ayahData['sura_name_ar'].replaceAll(RegExp(r"[\u064B-\u0652]"), '') == searchValue) {
-        pageNumber = ayahData['page'];
-        break;
-      }
-    }
-    if (pageNumber != -1) {
-      _pageController.jumpToPage(pageNumber - 1);
-    }
-  }
+
   @override
   void initState() {
     readJson();
@@ -64,164 +53,312 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xffbce0c5),
-      body: PageView.builder(
-        controller: _pageController,
-        reverse: true,
-        itemBuilder: (BuildContext context, int index) {
-          if (_items.isNotEmpty) {
-            String byPage = '';
-            String surahName = '';
-            int jozzNum = 0;
-            bool isBasmalahShown = false;
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 1,
+          centerTitle: true,
+          backgroundColor: const Color(0xffbce0c5),
+          title: const Text(
+            'القرآن الكريم',
+            style: TextStyle(color: Color(0xff055D1B)),
+          ),
+          iconTheme: IconThemeData(color: Color(0xff055D1B)),
+          actions: [
+            IconButton(
+              onPressed: () {
+                showSearch(
+                  context: context,
+                  delegate: CustomSearchDelegate(items: _items),
+                );
+              },
+              icon: Icon(Icons.search),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xffbce0c5),
+        body: PageView.builder(
+          controller: _pageController,
+          reverse: true,
+          itemBuilder: (BuildContext context, int index) {
+            if (_items.isNotEmpty) {
+              String byPage = '';
+              String surahName = '';
+              int jozzNum = 0;
+              bool isBasmalahShown = false;
 
-            for (Map ayahData in _items) {
-              if (ayahData['page'] == index + 1) {
-                byPage = byPage + ' ${ayahData['aya_text']}';
-              }
-            }
-
-            for (Map ayahData in _items) {
-              if (ayahData['page'] == index + 1) {
-                surahName = ayahData['sura_name_ar'];
-              }
-            }
-
-            for (Map ayahData in _items) {
-              if (ayahData['page'] == index + 1) {
-                jozzNum = ayahData['jozz'];
-              }
-            }
-
-            for (Map ayahData in _items) {
-              if (ayahData['page'] == index + 1) {
-                if (ayahData['aya_no'] == 1 &&
-                    ayahData['sura_name_ar'] != 'الفَاتِحة' &&
-                    ayahData['sura_name_ar'] != 'التوبَة') {
-                  isBasmalahShown = true;
-                  break;
+              for (Map ayahData in _items) {
+                if (ayahData['page'] == index + 1) {
+                  byPage = byPage + ' ${ayahData['aya_text']}';
                 }
               }
-            }
 
-            return SafeArea(
-              child: Container(
-                decoration: index % 2 == 0
-                    ? const BoxDecoration(
-                    gradient: LinearGradient(
-                        colors: [
-                          Colors.black26,
-                          Colors.transparent,
-                          Colors.transparent,
-                          Colors.transparent,
-                          Colors.transparent
-                        ],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight))
-                    : const BoxDecoration(
-                    gradient: LinearGradient(
-                        colors: [
-                          Colors.black26,
-                          Colors.transparent,
-                          Colors.transparent,
-                          Colors.transparent,
-                          Colors.transparent
-                        ],
-                        begin: Alignment.centerRight,
-                        end: Alignment.centerLeft)),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey, width: 2),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          padding: EdgeInsets.only(left: 8),
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: "Search Surah Name",
-                              border: InputBorder.none,
+              for (Map ayahData in _items) {
+                if (ayahData['page'] == index + 1) {
+                  surahName = ayahData['sura_name_ar'];
+                }
+              }
+
+              for (Map ayahData in _items) {
+                if (ayahData['page'] == index + 1) {
+                  jozzNum = ayahData['jozz'];
+                }
+              }
+
+              for (Map ayahData in _items) {
+                if (ayahData['page'] == index + 1) {
+                  if (ayahData['aya_no'] == 1 &&
+                      ayahData['sura_name_ar'] != 'الفَاتِحة' &&
+                      ayahData['sura_name_ar'] != 'التوبَة') {
+                    isBasmalahShown = true;
+                    break;
+                  }
+                }
+              }
+
+              return SafeArea(
+                child: Container(
+                  decoration: index % 2 == 0
+                      ? const BoxDecoration(
+                          gradient: LinearGradient(
+                              colors: [
+                              Color(0x27000000),
+                              Colors.transparent,
+                              Colors.transparent,
+                              Colors.transparent,
+                              Colors.transparent
+                            ],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight))
+                      : const BoxDecoration(
+                          gradient: LinearGradient(
+                              colors: [
+                              Color(0x27000000),
+                              Colors.transparent,
+                              Colors.transparent,
+                              Colors.transparent,
+                              Colors.transparent
+                            ],
+                              begin: Alignment.centerRight,
+                              end: Alignment.centerLeft)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Align(
+                            alignment: Alignment.topCenter,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'الجزء $jozzNum',
+                                    style: const TextStyle(
+                                        fontFamily: 'Kitab', fontSize: 20),
+                                    textAlign: TextAlign.center,
+                                    textDirection: TextDirection.rtl,
+                                  ),
+                                  Text(
+                                    surahName,
+                                    style: const TextStyle(
+                                        fontFamily: 'Kitab', fontSize: 20),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
                             ),
-                            onSubmitted: (value) {
-                              _search(value);
-                            },
                           ),
-                        ),
-                        Align(
-                          alignment: Alignment.topCenter,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          Align(
+                            alignment: Alignment.center,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
-                                  'الجزء $jozzNum',
-                                  style: const TextStyle(
-                                      fontFamily: 'Kitab', fontSize: 20),
-                                  textAlign: TextAlign.center,
-                                  textDirection: TextDirection.rtl,
+                                isBasmalahShown
+                                    ? const Text(
+                                        "‏ ‏‏ ‏‏‏‏ ‏‏‏‏‏‏ ‏",
+                                        textDirection: TextDirection.rtl,
+                                        style: TextStyle(
+                                            fontFamily: 'Hafs', fontSize: 22),
+                                        textAlign: TextAlign.center,
+                                      )
+                                    : Container(),
+                                const SizedBox(
+                                  height: 15,
                                 ),
                                 Text(
-                                  surahName,
+                                  byPage,
+                                  textDirection: TextDirection.rtl,
                                   style: const TextStyle(
-                                      fontFamily: 'Kitab', fontSize: 20),
+                                      fontFamily: 'Hafs', fontSize: 22),
                                   textAlign: TextAlign.center,
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              isBasmalahShown
-                                  ? const Text(
-                                "‏ ‏‏ ‏‏‏‏ ‏‏‏‏‏‏ ‏",
-                                textDirection: TextDirection.rtl,
-                                style: TextStyle(
-                                    fontFamily: 'Hafs', fontSize: 22),
-                                textAlign: TextAlign.center,
-                              )
-                                  : Container(),
-                              const SizedBox(
-                                height: 15,
-                              ),
-                              Text(
-                                byPage,
-                                textDirection: TextDirection.rtl,
+                          Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Text(
+                                '${index + 1}',
                                 style: const TextStyle(
-                                    fontFamily: 'Hafs', fontSize: 22),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Text(
-                              '${index + 1}',
-                              style: const TextStyle(
-                                  fontFamily: 'Kitab', fontSize: 18),
-                            ))
-                      ],
+                                    fontFamily: 'Kitab', fontSize: 18),
+                              ))
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            );
-          } else {
-            return const Center(child: CircularProgressIndicator(
-              backgroundColor: Color(0xffbce0c5),
-            ));
-          }
-        },
+              );
+            } else {
+              return const Center(
+                  child: CircularProgressIndicator(
+                backgroundColor: Color(0xffbce0c5),
+              ));
+            }
+          },
+        ),
       ),
     );
+  }
+}
+
+//searchDelegate to search for word in quraan
+
+class CustomSearchDelegate extends SearchDelegate {
+  final List items;
+
+  CustomSearchDelegate({required this.items});
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    // TODO: implement buildActions
+    return [
+      IconButton(
+        icon: Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      ),
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    // TODO: implement buildLeading
+    return IconButton(
+      icon: Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, null);
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    List filteredData = [];
+    if (query.isNotEmpty) {
+      filteredData = items
+          .where((element) =>
+              element['aya_text_emlaey'].toString().contains(query.trim()))
+          .toList();
+
+      return ListView.separated(
+        itemBuilder: (context, index) {
+          return ListTile(
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/', arguments: [
+                filteredData[index]['page'],
+                filteredData[index]['id']
+              ]);
+            },
+            title: Text(
+              filteredData[index]['aya_text'],
+              textDirection: TextDirection.rtl,
+              style: TextStyle(fontFamily: 'Hafs'),
+              textAlign: TextAlign.right,
+            ),
+            subtitle: Text(
+              filteredData[index]['sura_name_ar'],
+              textDirection: TextDirection.rtl,
+              textAlign: TextAlign.right,
+            ),
+            leading: Column(
+              children: [
+                Text('الصفحة'),
+                Text(
+                  filteredData[index]['page'].toString(),
+                  textDirection: TextDirection.rtl,
+                  textAlign: TextAlign.right,
+                )
+              ],
+            ),
+          );
+        },
+        itemCount: filteredData.length,
+        separatorBuilder: (BuildContext context, int index) {
+          return Divider();
+        },
+      );
+    } else {
+      return Column(
+        children: [],
+      );
+    }
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    List filteredData = [];
+    if (query.isNotEmpty) {
+      filteredData = items
+          .where((element) =>
+              element['aya_text_emlaey'].toString().contains(query.trim()))
+          .toList();
+
+      return ListView.separated(
+        itemBuilder: (context, index) {
+          return ListTile(
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/', arguments: [
+                filteredData[index]['page'],
+                filteredData[index]['id']
+              ]);
+            },
+            title: Text(
+              filteredData[index]['aya_text'],
+              textDirection: TextDirection.rtl,
+              style: TextStyle(fontFamily: 'Hafs'),
+              textAlign: TextAlign.right,
+            ),
+            subtitle: Text(
+              filteredData[index]['sura_name_ar'],
+              textDirection: TextDirection.rtl,
+              textAlign: TextAlign.right,
+            ),
+            leading: Column(
+              children: [
+                Text('الصفحة'),
+                Text(
+                  filteredData[index]['page'].toString(),
+                  textDirection: TextDirection.rtl,
+                  textAlign: TextAlign.right,
+                )
+              ],
+            ),
+          );
+        },
+        itemCount: filteredData.length,
+        separatorBuilder: (BuildContext context, int index) {
+          return Divider();
+        },
+      );
+    } else {
+      return Column(
+        children: [],
+      );
+    }
   }
 }
